@@ -1,0 +1,35 @@
+﻿### Unity
+
+[](https://github.com/Cysharp/R3?tab=readme-ov-file#unity)
+
+The minimum Unity support for R3 is Unity 2021.3.
+
+### R3 Installation Steps
+
+**1. Install NuGet Packages**
+
+-   Open `Window -> NuGet -> Manage NuGet Packages`.
+-   **Install R3:** Search for "**R3**" and press **Install**.
+-   **Install ObservableCollections:** Search for "**ObservableCollections**" (also from Cysharp) and press **Install**.
+-   **Install ObservableCollections.R3:** Search for "**ObservableCollections.R3**" and press **Install**. This is an extension module to make `ObservableCollections` work smoothly with `R3`.
+
+    [![](https://private-user-images.githubusercontent.com/46207/294908799-dbad9bf7-28e3-4856-b0a8-0ff8a2a01d67.png?jwt=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJnaXRodWIuY29tIiwiYXVkIjoicmF3LmdpdGh1YnVzZXJjb250ZW50LmNvbSIsImtleSI6ImtleTUiLCJleHAiOjE3NjU0MjAwNzQsIm5iZiI6MTc2NTQxOTc3NCwicGF0aCI6Ii80NjIwNy8yOTQ5MDg3OTktZGJhZDliZjctMjhlMy00ODU2LWIwYTgtMGZmOGEyYTAxZDY3LnBuZz9YLUFtei1BbGdvcml0aG09QVdTNC1ITUFDLVNIQTI1NiZYLUFtei1DcmVkZW50aWFsPUFLSUFWQ09EWUxTQTUzUFFLNFpBJTJGMjAyNTEyMTElMkZ1cy1lYXN0LTElMkZzMyUyRmF3czRfcmVxdWVzdCZYLUFtei1EYXRlPTIwMjUxMjExVDAyMjI1NFomWC1BbXotRXhwaXJlcz0zMDAmWC1BbXotU2lnbmF0dXJlPWI4MjJkYjM2YWNmNjllYTQ2YzRlMjFhN2FmYWU3NTRkNTNmMDEyYjcyMzZjNTYwMGEyN2M3MGIzOTVkZDdiMzYmWC1BbXotU2lnbmVkSGVhZGVycz1ob3N0In0.va9EDTy7Ws51mRxrDHeUGsC7tNx2AYVQ0MLvE95VhPI)](https://private-user-images.githubusercontent.com/46207/294908799-dbad9bf7-28e3-4856-b0a8-0ff8a2a01d67.png?jwt=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJnaXRodWIuY29tIiwiYXVkIjoicmF3LmdpdGh1YnVzZXJjb250ZW50LmNvbSIsImtleSI6ImtleTUiLCJleHAiOjE3NjU0MjAwNzQsIm5iZiI6MTc2NTQxOTc3NCwicGF0aCI6Ii80NjIwNy8yOTQ5MDg3OTktZGJhZDliZjctMjhlMy00ODU2LWIwYTgtMGZmOGEyYTAxZDY3LnBuZz9YLUFtei1BbGdvcml0aG09QVdTNC1ITUFDLVNIQTI1NiZYLUFtei1DcmVkZW50aWFsPUFLSUFWQ09EWUxTQTUzUFFLNFpBJTJGMjAyNTEyMTElMkZ1cy1lYXN0LTElMkZzMyUyRmF3czRfcmVxdWVzdCZYLUFtei1EYXRlPTIwMjUxMjExVDAyMjI1NFomWC1BbXotRXhwaXJlcz0zMDAmWC1BbXotU2lnbmF0dXJlPWI4MjJkYjM2YWNmNjllYTQ2YzRlMjFhN2FmYWU3NTRkNTNmMDEyYjcyMzZjNTYwMGEyN2M3MGIzOTVkZDdiMzYmWC1BbXotU2lnbmVkSGVhZGVycz1ob3N0In0.va9EDTy7Ws51mRxrDHeUGsC7tNx2AYVQ0MLvE95VhPI)
+
+-   If you encounter version conflict errors, please disable version validation in Player Settings(Edit -> Project Settings -> Player -> Scroll down and expand "Other Settings" than uncheck "Assembly Version Validation" under the "Configuration" section).
+
+**2. Install R3.Unity Package**
+
+-   Install the `R3.Unity` package by referencing the git URL:
+    ```
+    https://github.com/Cysharp/R3.git?path=src/R3.Unity/Assets/R3.Unity
+    ```
+
+[![image](https://private-user-images.githubusercontent.com/46207/294912794-7325d266-05b4-47c9-b06a-a67a40368dd2.png?jwt=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJnaXRodWIuY29tIiwiYXVkIjoicmF3LmdpdGh1YnVzZXJjb250ZW50LmNvbSIsImtleSI6ImtleTUiLCJleHAiOjE3NjU0MjAwNzQsIm5iZiI6MTc2NTQxOTc3NCwicGF0aCI6Ii80NjIwNy8yOTQ5MTI3OTQtNzMyNWQyNjYtMDViNC00N2M5LWIwNmEtYTY3YTQwMzY4ZGQyLnBuZz9YLUFtei1BbGdvcml0aG09QVdTNC1ITUFDLVNIQTI1NiZYLUFtei1DcmVkZW50aWFsPUFLSUFWQ09EWUxTQTUzUFFLNFpBJTJGMjAyNTEyMTElMkZ1cy1lYXN0LTElMkZzMyUyRmF3czRfcmVxdWVzdCZYLUFtei1EYXRlPTIwMjUxMjExVDAyMjI1NFomWC1BbXotRXhwaXJlcz0zMDAmWC1BbXotU2lnbmF0dXJlPWVhZjkyYWFjMGUzNTE5ZjEyZDM3NmZkNzhjYWY3MzBmYjQ2ZGY1NzkyZWEyMmUzMDM1OWJjNDU4ODliMThhNTMmWC1BbXotU2lnbmVkSGVhZGVycz1ob3N0In0.Qc6Nd6VIM9dJFG2cvnjWeHS7T6OSDg27Ls6SUMOKX98)](https://private-user-images.githubusercontent.com/46207/294912794-7325d266-05b4-47c9-b06a-a67a40368dd2.png?jwt=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJnaXRodWIuY29tIiwiYXVkIjoicmF3LmdpdGh1YnVzZXJjb250ZW50LmNvbSIsImtleSI6ImtleTUiLCJleHAiOjE3NjU0MjAwNzQsIm5iZiI6MTc2NTQxOTc3NCwicGF0aCI6Ii80NjIwNy8yOTQ5MTI3OTQtNzMyNWQyNjYtMDViNC00N2M5LWIwNmEtYTY3YTQwMzY4ZGQyLnBuZz9YLUFtei1BbGdvcml0aG09QVdTNC1ITUFDLVNIQTI1NiZYLUFtei1DcmVkZW50aWFsPUFLSUFWQ09EWUxTQTUzUFFLNFpBJTJGMjAyNTEyMTElMkZ1cy1lYXN0LTElMkZzMyUyRmF3czRfcmVxdWVzdCZYLUFtei1EYXRlPTIwMjUxMjExVDAyMjI1NFomWC1BbXotRXhwaXJlcz0zMDAmWC1BbXotU2lnbmF0dXJlPWVhZjkyYWFjMGUzNTE5ZjEyZDM3NmZkNzhjYWY3MzBmYjQ2ZGY1NzkyZWEyMmUzMDM1OWJjNDU4ODliMThhNTMmWC1BbXotU2lnbmVkSGVhZGVycz1ob3N0In0.Qc6Nd6VIM9dJFG2cvnjWeHS7T6OSDg27Ls6SUMOKX98) [![image](https://private-user-images.githubusercontent.com/46207/294913254-29bf5636-4d6a-4e75-a3d8-3f8408bd8c51.png?jwt=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJnaXRodWIuY29tIiwiYXVkIjoicmF3LmdpdGh1YnVzZXJjb250ZW50LmNvbSIsImtleSI6ImtleTUiLCJleHAiOjE3NjU0MjAwNzQsIm5iZiI6MTc2NTQxOTc3NCwicGF0aCI6Ii80NjIwNy8yOTQ5MTMyNTQtMjliZjU2MzYtNGQ2YS00ZTc1LWEzZDgtM2Y4NDA4YmQ4YzUxLnBuZz9YLUFtei1BbGdvcml0aG09QVdTNC1ITUFDLVNIQTI1NiZYLUFtei1DcmVkZW50aWFsPUFLSUFWQ09EWUxTQTUzUFFLNFpBJTJGMjAyNTEyMTElMkZ1cy1lYXN0LTElMkZzMyUyRmF3czRfcmVxdWVzdCZYLUFtei1EYXRlPTIwMjUxMjExVDAyMjI1NFomWC1BbXotRXhwaXJlcz0zMDAmWC1BbXotU2lnbmF0dXJlPWRkODdhOTBkMTFmOTljNDQ2ZmQxMTUwZTc4YTU3MWFjNzRjYTIwNzBlZmJkMGE4ZWI0ODI1YjM2MjlmZDczMmUmWC1BbXotU2lnbmVkSGVhZGVycz1ob3N0In0.0SBuRWuvzjoqVdvxzCUBoqDnNYRmjcyUG3GipVp2fKI)](https://private-user-images.githubusercontent.com/46207/294913254-29bf5636-4d6a-4e75-a3d8-3f8408bd8c51.png?jwt=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJnaXRodWIuY29tIiwiYXVkIjoicmF3LmdpdGh1YnVzZXJjb250ZW50LmNvbSIsImtleSI6ImtleTUiLCJleHAiOjE3NjU0MjAwNzQsIm5iZiI6MTc2NTQxOTc3NCwicGF0aCI6Ii80NjIwNy8yOTQ5MTMyNTQtMjliZjU2MzYtNGQ2YS00ZTc1LWEzZDgtM2Y4NDA4YmQ4YzUxLnBuZz9YLUFtei1BbGdvcml0aG09QVdTNC1ITUFDLVNIQTI1NiZYLUFtei1DcmVkZW50aWFsPUFLSUFWQ09EWUxTQTUzUFFLNFpBJTJGMjAyNTEyMTElMkZ1cy1lYXN0LTElMkZzMyUyRmF3czRfcmVxdWVzdCZYLUFtei1EYXRlPTIwMjUxMjExVDAyMjI1NFomWC1BbXotRXhwaXJlcz0zMDAmWC1BbXotU2lnbmF0dXJlPWRkODdhOTBkMTFmOTljNDQ2ZmQxMTUwZTc4YTU3MWFjNzRjYTIwNzBlZmJkMGE4ZWI0ODI1YjM2MjlmZDczMmUmWC1BbXotU2lnbmVkSGVhZGVycz1ob3N0In0.0SBuRWuvzjoqVdvxzCUBoqDnNYRmjcyUG3GipVp2fKI)
+
+R3 uses the *.*.* release tag, so you can specify a version like #1.0.0. For example: `https://github.com/Cysharp/R3.git?path=src/R3.Unity/Assets/R3.Unity#1.0.0`
+
+### Troubleshooting
+If you see errors like `The type or namespace name 'Collections' does not exist in the namespace 'R3'`, it often means the package cache is stale. To fix this:
+1. Close Unity.
+2. Delete the `Library/PackageCache/com.cysharp.r3@<some_hash>` folder from your project directory.
+3. Re-open Unity. It will re-import the package, which should resolve the issue.

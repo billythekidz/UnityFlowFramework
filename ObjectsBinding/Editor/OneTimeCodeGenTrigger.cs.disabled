@@ -1,0 +1,34 @@
+﻿using UnityEditor;
+using UnityEngine;
+
+/// <summary>
+/// One-time trigger to generate code when Unity loads.
+/// This file will delete itself after first run.
+/// </summary>
+[InitializeOnLoad]
+public class OneTimeCodeGenTrigger
+{
+    static OneTimeCodeGenTrigger()
+    {
+        if (!EditorPrefs.HasKey("ObjectsBinding_FirstGenDone"))
+        {
+            EditorApplication.delayCall += () =>
+            {
+                Debug.Log("[OneTimeCodeGenTrigger] Triggering initial code generation...");
+                
+                var fallbackType = System.Type.GetType("LEARNING.GameFlowFramework.ObjectsBinding.Editor.FallbackCodeGenerator,Assembly-CSharp-Editor");
+                if (fallbackType != null)
+                {
+                    var method = fallbackType.GetMethod("ForceRegenerateAll", System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Static);
+                    if (method != null)
+                    {
+                        method.Invoke(null, null);
+                        EditorPrefs.SetBool("ObjectsBinding_FirstGenDone", true);
+                        Debug.Log("[OneTimeCodeGenTrigger] ✓ Initial generation complete!");
+                    }
+                }
+            };
+        }
+    }
+}
+

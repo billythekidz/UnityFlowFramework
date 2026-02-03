@@ -1,0 +1,455 @@
+﻿#if UNITY_EDITOR
+/*
+ * THIS SCRIPT IS NOW OBSOLETE.
+ *
+ * The UIBind system has been simplified to use a manual "UPDATE UI BINDING" button
+ * in the inspector of any script with the [UIBind] attribute. This removes the need
+ * for complex background scanning and JSON-based monitoring.
+ *
+ * This file is kept for reference but its functionality has been disabled to prevent
+ * compilation errors and conflicts with the new, simpler workflow.
+ */
+
+/*
+using UnityEngine;
+using UnityEditor;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
+using System.IO;
+using ObjectsBinding;
+namespace ObjectsBinding.Editor
+{
+    /// <summary>
+    /// Scans all assemblies for classes with [UIBind] attribute
+    /// and rebuilds MonitoredObjects.json if needed
+    /// </summary>
+    public static class UIBindAttributeScanner
+    {
+        /// <summary>
+        /// Scan all assemblies and rebuild MonitoredObjects.json from attributes
+        /// </summary>
+        // [MenuItem("Tools/UI Binding/Rebuild All")]
+        public static void RebuildFromAttributes()
+        {
+            UIBindLogger.Log("🔍 Scanning assemblies for [UIBind] attributes...");
+            
+            var viewClasses = FindAllUIBindClasses();
+            
+            if (viewClasses.Count == 0)
+            {
+                UIBindLogger.LogWarning("No classes with [UIBind] attribute found!");
+                return;
+            }
+            
+            UIBindLogger.Log($"✅ Found {viewClasses.Count} View classes:");
+
+            // Load MonitoredObjects.json once and reuse
+            var monitoredObjects = LoadMonitoredObjects();
+
+            foreach (var info in viewClasses)
+            {
+                string displayPath = info.GameObjectPath;
+
+                // If empty, try to find from MonitoredObjects.json
+                if (string.IsNullOrEmpty(displayPath))
+                {
+                    var monitored = monitoredObjects.FirstOrDefault(m => m.ScriptPath == info.ScriptPath);
+                    if (monitored != null)
+                    {
+                        displayPath = $"{monitored.GameObjectPath} (from MonitoredObjects.json)";
+                    }
+                    else
+                    {
+                        displayPath = "(empty - not in MonitoredObjects.json)";
+                    }
+                }
+
+                UIBindLogger.Log($"  • {info.ClassName} → Script: {info.ScriptPath}");
+                UIBindLogger.Log($"    GameObject: {displayPath}");
+            }
+
+            // Try to find and register each one
+            int registered = 0;
+            int failed = 0;
+
+            foreach (var info in viewClasses)
+            {
+                string gameObjectPath = info.GameObjectPath;
+                GameObject go = null;
+
+                // Strategy 1: If GameObjectPath is provided in attribute, use it
+                if (!string.IsNullOrEmpty(gameObjectPath))
+                {
+                    go = FindGameObject(gameObjectPath);
+                }
+                // Strategy 2: Try to find from MonitoredObjects.json
+                else
+                {
+                    var monitored = monitoredObjects.FirstOrDefault(m => m.ScriptPath == info.ScriptPath);
+                    if (monitored != null)
+                    {
+                        gameObjectPath = monitored.GameObjectPath;
+                        UIBindLogger.Log($"   Found path from MonitoredObjects.json: {gameObjectPath}");
+                        go = FindGameObject(gameObjectPath);
+                    }
+                }
+
+                // Strategy 3: Auto-detect by scanning all GameObjects with this script
+                if (go == null)
+                {
+                    UIBindLogger.Log($"   Auto-detecting GameObject for: {info.ClassName}...");
+                    go = FindGameObjectByScriptPath(info.ScriptPath);
+                }
+
+                if (go != null)
+                {
+                    UIBindAutoMapping.StartMonitoring(go, info.ScriptPath);
+                    registered++;
+                }
+                else
+                {
+                    UIBindLogger.LogWarning($"⚠️ Could not find GameObject for script: {info.ScriptPath}");
+                    UIBindLogger.LogWarning($"   Class: {info.ClassName}");
+                    UIBindLogger.LogWarning($"   Tip 1: Ensure the GameObject exists in the current scene or as a prefab");
+                    UIBindLogger.LogWarning($"   Tip 2: Ensure the script is attached to a GameObject");
+                    UIBindLogger.LogWarning($"   Tip 3: Try specifying GameObjectPath explicitly: [UIBind(GameObjectPath = \"Your/Path\")]");
+                    failed++;
+                }
+            }
+            
+            UIBindLogger.Log($"✅ Rebuild complete! Registered: {registered}, Failed: {failed}");
+        }
+        
+        /// <summary>
+        /// Health check: Compare attributes with MonitoredObjects.json
+        /// </summary>
+        // [MenuItem("Tools/UI Binding/Refresh")]
+        public static void HealthCheck()
+        {
+            UIBindLogger.Log("🏥 Running health check...");
+            
+            var attributeClasses = FindAllUIBindClasses();
+            var monitoredObjects = LoadMonitoredObjects();
+            
+            UIBindLogger.Log($"📊 Found {attributeClasses.Count} classes with [UIBind] attribute");
+            UIBindLogger.Log($"📊 Found {monitoredObjects.Count} entries in MonitoredObjects.json");
+            
+            // Check for classes with attribute but not in JSON
+            var notInJson = attributeClasses.Where(a => 
+                !monitoredObjects.Any(m => m.GameObjectPath == a.GameObjectPath)).ToList();
+                
+            if (notInJson.Count > 0)
+            {
+                UIBindLogger.LogWarning($"⚠️ {notInJson.Count} classes not in MonitoredObjects.json:");
+                foreach (var info in notInJson)
+                {
+                    UIBindLogger.LogWarning($"  • {info.ClassName} → {info.GameObjectPath}");
+                }
+            }
+            
+            // Check for entries in JSON but no attribute
+            var noAttribute = monitoredObjects.Where(m =>
+                !attributeClasses.Any(a => a.GameObjectPath == m.GameObjectPath)).ToList();
+                
+            if (noAttribute.Count > 0)
+            {
+                UIBindLogger.LogWarning($"⚠️ {noAttribute.Count} entries in JSON without [UIBind] attribute:");
+                foreach (var info in noAttribute)
+                {
+                    UIBindLogger.LogWarning($"  • {info.GameObjectPath}");
+                }
+            }
+            
+            // Check for missing GameObjects
+            int missingGO = 0;
+            foreach (var info in attributeClasses)
+            {
+                if (FindGameObject(info.GameObjectPath) == null)
+                {
+                    UIBindLogger.LogWarning($"⚠️ GameObject not found: {info.GameObjectPath}");
+                    missingGO++;
+                }
+            }
+            
+            if (notInJson.Count == 0 && noAttribute.Count == 0 && missingGO == 0)
+            {
+                UIBindLogger.Log("✅ Health check passed! Everything is in sync.");
+            }
+            else
+            {
+                UIBindLogger.LogWarning($"⚠️ Health check found issues:");
+                UIBindLogger.LogWarning($"  • Not in JSON: {notInJson.Count}");
+                UIBindLogger.LogWarning($"  • No attribute: {noAttribute.Count}");
+                UIBindLogger.LogWarning($"  • Missing GameObject: {missingGO}");
+                
+                if (EditorUtility.DisplayDialog(
+                    "Health Check Issues Found",
+                    $"Found {notInJson.Count + noAttribute.Count + missingGO} issues.\n\nWould you like to rebuild from attributes?",
+                    "Rebuild",
+                    "Cancel"))
+                {
+                    RebuildFromAttributes();
+                }
+            }
+        }
+        
+        private class UIBindInfo
+        {
+            public string ClassName;
+            public string ScriptPath;        // UNIQUE identifier
+            public string GameObjectPath;    // Display only
+            public Type ClassType;
+        }
+        
+        private class MonitoredInfo
+        {
+            public string GameObjectPath;
+            public string ScriptPath;
+        }
+        
+        private static List<UIBindInfo> FindAllUIBindClasses()
+        {
+            var result = new List<UIBindInfo>();
+            
+            // Get all assemblies
+            var assemblies = AppDomain.CurrentDomain.GetAssemblies();
+            
+            foreach (var assembly in assemblies)
+            {
+                // Skip Unity assemblies
+                if (assembly.FullName.StartsWith("Unity") || 
+                    assembly.FullName.StartsWith("System") ||
+                    assembly.FullName.StartsWith("Mono."))
+                    continue;
+                    
+                try
+                {
+                    var types = assembly.GetTypes();
+                    
+                    foreach (var type in types)
+                    {
+                        if (type.IsAbstract || type.IsInterface) continue;
+                        
+                        var attr = type.GetCustomAttribute<UIBindAttribute>();
+                        if (attr != null)
+                        {
+                            result.Add(new UIBindInfo
+                            {
+                                ClassName = type.Name,
+                                ScriptPath = attr.ScriptPath,           // UNIQUE key
+                                GameObjectPath = attr.GameObjectPath,   // Display info
+                                ClassType = type
+                            });
+                        }
+                    }
+                }
+                catch (ReflectionTypeLoadException)
+                {
+                    // Skip assemblies that fail to load
+                    continue;
+                }
+            }
+            
+            return result;
+        }
+        
+        private static List<MonitoredInfo> LoadMonitoredObjects()
+        {
+            string syncFile = "Assets/ObjectsBinding/Sync/MonitoredObjects.json";
+            
+            if (!File.Exists(syncFile))
+                return new List<MonitoredInfo>();
+                
+            try
+            {
+                string json = File.ReadAllText(syncFile);
+                var wrapper = JsonUtility.FromJson<MonitoredListWrapper>(json);
+                
+                if (wrapper?.list == null)
+                    return new List<MonitoredInfo>();
+                    
+                return wrapper.list.Select(m => new MonitoredInfo
+                {
+                    GameObjectPath = m.objectPath,
+                    ScriptPath = m.scriptPath
+                }).ToList();
+            }
+            catch
+            {
+                return new List<MonitoredInfo>();
+            }
+        }
+        
+        /// <summary>
+        /// Auto-detect GameObject by scanning prefabs and parsing scene YAML files
+        /// Returns GameObject for prefabs, or SceneObjectInfo for scene objects
+        /// </summary>
+        private static GameObject FindGameObjectByScriptPath(string scriptPath)
+        {
+            // First, get the script GUID (needed for YAML parsing)
+            string scriptGuid = AssetDatabase.AssetPathToGUID(scriptPath);
+            if (string.IsNullOrEmpty(scriptGuid))
+            {
+                UIBindLogger.LogWarning($"   Could not find GUID for script: {scriptPath}");
+                return null;
+            }
+
+            UIBindLogger.Log($"   Script GUID: {scriptGuid}");
+
+            // Try all prefabs first (safe - no scene loading)
+            string[] prefabGuids = AssetDatabase.FindAssets("t:Prefab");
+            foreach (string guid in prefabGuids)
+            {
+                string prefabPath = AssetDatabase.GUIDToAssetPath(guid);
+                GameObject prefab = AssetDatabase.LoadAssetAtPath<GameObject>(prefabPath);
+
+                if (prefab != null)
+                {
+                    var found = FindGameObjectWithScript(prefab.transform, scriptPath);
+                    if (found != null)
+                    {
+                        UIBindLogger.Log($"   ✅ Found in prefab: {prefabPath} → {GetGameObjectPath(found.transform)}");
+                        return found;
+                    }
+                }
+            }
+
+            UIBindLogger.LogWarning($"   ❌ Script not found in any prefab");
+            UIBindLogger.LogWarning($"   Note: Scene scanning is not yet fully implemented (requires scene loading)");
+            UIBindLogger.LogWarning($"   Workaround: Add the GameObject to a prefab, or specify path in attribute: [UIBind(GameObjectPath = \"Your/Path\")]");
+            return null;
+        }
+
+        /// <summary>
+        /// Recursively search for GameObject that has a MonoBehaviour with matching script path
+        /// </summary>
+        private static GameObject FindGameObjectWithScript(Transform root, string targetScriptPath)
+        {
+            // Check this GameObject
+            var components = root.GetComponents<MonoBehaviour>();
+            foreach (var comp in components)
+            {
+                if (comp == null) continue;
+
+                // Get script asset path
+                var monoScript = MonoScript.FromMonoBehaviour(comp);
+                if (monoScript != null)
+                {
+                    string scriptAssetPath = AssetDatabase.GetAssetPath(monoScript);
+
+                    // Convert to absolute path for comparison
+                    string absoluteScriptPath = Path.GetFullPath(scriptAssetPath);
+                    string absoluteTargetPath = Path.GetFullPath(targetScriptPath);
+
+                    if (absoluteScriptPath.Equals(absoluteTargetPath, StringComparison.OrdinalIgnoreCase))
+                    {
+                        return root.gameObject;
+                    }
+                }
+            }
+
+            // Search children recursively
+            foreach (Transform child in root)
+            {
+                var found = FindGameObjectWithScript(child, targetScriptPath);
+                if (found != null) return found;
+            }
+
+            return null;
+        }
+
+        /// <summary>
+        /// Get hierarchy path from Transform
+        /// </summary>
+        private static string GetGameObjectPath(Transform transform)
+        {
+            string path = transform.name;
+            while (transform.parent != null)
+            {
+                transform = transform.parent;
+                path = transform.name + "/" + path;
+            }
+            return path;
+        }
+
+        private static GameObject FindGameObject(string path)
+        {
+            // If path is provided, use traditional path-based search
+            if (!string.IsNullOrEmpty(path))
+            {
+                // Try scene first
+                var go = GameObject.Find(path);
+                if (go != null) return go;
+
+                // Try all root GameObjects
+                var scene = UnityEngine.SceneManagement.SceneManager.GetActiveScene();
+                var rootObjects = scene.GetRootGameObjects();
+
+                foreach (var root in rootObjects)
+                {
+                    var found = FindInHierarchy(root.transform, path);
+                    if (found != null) return found.gameObject;
+                }
+
+                // Try prefabs
+                string[] prefabGuids = AssetDatabase.FindAssets("t:Prefab");
+                foreach (string guid in prefabGuids)
+                {
+                    string prefabPath = AssetDatabase.GUIDToAssetPath(guid);
+                    GameObject prefab = AssetDatabase.LoadAssetAtPath<GameObject>(prefabPath);
+
+                    if (prefab != null)
+                    {
+                        var found = FindInHierarchy(prefab.transform, path);
+                        if (found != null) return found.gameObject;
+                    }
+                }
+            }
+
+            return null;
+        }
+        
+        private static Transform FindInHierarchy(Transform root, string path)
+        {
+            string[] parts = path.Split('/');
+            
+            // Check if root matches first part
+            if (root.name != parts[0])
+                return null;
+                
+            if (parts.Length == 1)
+                return root;
+                
+            // Traverse down
+            Transform current = root;
+            for (int i = 1; i < parts.Length; i++)
+            {
+                Transform child = current.Find(parts[i]);
+                if (child == null) return null;
+                current = child;
+            }
+            
+            return current;
+        }
+        
+        [System.Serializable]
+        private class MonitoredListWrapper
+        {
+            public List<MonitoredObjectInfo> list;
+        }
+        
+        [System.Serializable]
+        private class MonitoredObjectInfo
+        {
+            public string objectPath;
+            public string scriptPath;
+            public string lastHash;
+            public string assetPath;
+            public string sceneGuid;
+        }
+    }
+}
+*/
+#endif

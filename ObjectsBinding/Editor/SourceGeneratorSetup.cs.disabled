@@ -1,0 +1,76 @@
+﻿using UnityEditor;
+using UnityEngine;
+
+namespace LEARNING.GameFlowFramework.ObjectsBinding.Editor
+{
+    /// <summary>
+    /// This script ensures the Source Generator DLL is properly configured as a RoslynAnalyzer.
+    /// It should run automatically when Unity reimports the DLL.
+    /// </summary>
+    public class SourceGeneratorSetup : AssetPostprocessor
+    {
+        private static void OnPostprocessAllAssets(
+            string[] importedAssets,
+            string[] deletedAssets,
+            string[] movedAssets,
+            string[] movedFromAssetPaths)
+        {
+            foreach (string assetPath in importedAssets)
+            {
+                // Check if this is the ObjectBindingGenerator assembly
+                if (assetPath.Contains("ObjectsBinding.SourceGenerator") && 
+                    assetPath.EndsWith(".dll"))
+                {
+                    ConfigureAsRoslynAnalyzer(assetPath);
+                }
+            }
+        }
+
+        private static void ConfigureAsRoslynAnalyzer(string dllPath)
+        {
+            var importer = AssetImporter.GetAtPath(dllPath) as PluginImporter;
+            if (importer == null) return;
+
+            // Set the DLL as RoslynAnalyzer
+            var labels = AssetDatabase.GetLabels(importer);
+            bool hasLabel = false;
+            foreach (var label in labels)
+            {
+                if (label == "RoslynAnalyzer")
+                {
+                    hasLabel = true;
+                    break;
+                }
+            }
+
+            if (!hasLabel)
+            {
+                Debug.Log($"[SourceGeneratorSetup] Adding RoslynAnalyzer label to: {dllPath}");
+                var newLabels = new string[labels.Length + 1];
+                labels.CopyTo(newLabels, 0);
+                newLabels[labels.Length] = "RoslynAnalyzer";
+                AssetDatabase.SetLabels(importer, newLabels);
+                
+                importer.SaveAndReimport();
+            }
+        }
+
+        //[MenuItem("Tools/UI Binding/Setup Source Generator")]
+        private static void ManualSetup()
+        {
+            string generatorDllPath = "Assets/LEARNING/GameFlowFramework/ObjectsBinding/SourceGenerator/Plugins/ObjectBindingGenerator.dll";
+            
+            if (System.IO.File.Exists(generatorDllPath))
+            {
+                ConfigureAsRoslynAnalyzer(generatorDllPath);
+                Debug.Log("[SourceGeneratorSetup] Source Generator setup completed!");
+            }
+            else
+            {
+                Debug.LogWarning($"[SourceGeneratorSetup] Generator DLL not found at: {generatorDllPath}");
+                Debug.LogWarning("[SourceGeneratorSetup] You need to compile the source generator project first.");
+            }
+        }
+    }
+}
+

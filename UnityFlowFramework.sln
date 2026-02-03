@@ -1,0 +1,35 @@
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.5.2.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ObjectsBinding", "ObjectsBinding", "{481CB88B-38AA-2406-D1C6-AFAFC62BF5FD}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "SourceGenerator", "SourceGenerator", "{A4A1C0AB-D2D5-3583-0313-DDB04DB6EB87}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "BuildDLL", "BuildDLL", "{F7BC9D42-211E-B4FA-2FF0-AEF6073F9B9A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ObjectsBinding.SourceGenerator.Standalone", "ObjectsBinding\SourceGenerator\BuildDLL\ObjectsBinding.SourceGenerator.Standalone.csproj", "{989D5EE1-80F3-3121-45E1-1E2517D52D39}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{989D5EE1-80F3-3121-45E1-1E2517D52D39}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{989D5EE1-80F3-3121-45E1-1E2517D52D39}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{989D5EE1-80F3-3121-45E1-1E2517D52D39}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{989D5EE1-80F3-3121-45E1-1E2517D52D39}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{A4A1C0AB-D2D5-3583-0313-DDB04DB6EB87} = {481CB88B-38AA-2406-D1C6-AFAFC62BF5FD}
+		{F7BC9D42-211E-B4FA-2FF0-AEF6073F9B9A} = {A4A1C0AB-D2D5-3583-0313-DDB04DB6EB87}
+		{989D5EE1-80F3-3121-45E1-1E2517D52D39} = {F7BC9D42-211E-B4FA-2FF0-AEF6073F9B9A}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {51252A5C-F334-4954-B345-94A2998D6ED4}
+	EndGlobalSection
+EndGlobal

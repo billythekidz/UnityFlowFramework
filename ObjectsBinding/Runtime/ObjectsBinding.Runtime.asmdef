@@ -1,0 +1,14 @@
+﻿{
+    "name": "ObjectsBinding.Runtime",
+    "rootNamespace": "ObjectsBinding",
+    "references": [],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

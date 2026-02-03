@@ -1,0 +1,30 @@
+﻿# Build artifacts - không commit vào git
+BuildDLL/obj/
+BuildDLL/Output/
+BuildDLL/bin/
+
+# Meta files của build artifacts
+BuildDLL/obj.meta
+BuildDLL/Output.meta
+BuildDLL/bin.meta
+
+# Build intermediate files
+*.deps.json
+*.deps.json.meta
+*.pdb
+*.pdb.meta
+
+# Temporary files
+*.tmp
+*.bak.bak
+
+# Log files
+*.log
+
+# Keep these important files (explicitly tracked)
+!BuildDLL/ObjectBindingGenerator.cs.bak
+!BuildDLL/ObjectsBinding.SourceGenerator.Standalone.csproj
+!BuildSourceGenerator.ps1
+!ObjectsBinding.SourceGenerator.dll
+!README.md
+
